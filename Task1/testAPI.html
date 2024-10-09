@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test API Gas Station</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      .form-container {
+        margin-bottom: 20px;
+      }
+      label {
+        display: block;
+        margin-bottom: 8px;
+      }
+      input {
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Test API Gas Station</h1>
+
+    <div class="form-container">
+      <h2>Upload File</h2>
+      <form id="uploadForm">
+        <label for="file">Chọn file .xlsx:</label>
+        <input type="file" id="file" name="file" accept=".xlsx" required />
+        <button type="submit">Upload</button>
+      </form>
+      <div id="uploadMessage"></div>
+    </div>
+
+    <div class="form-container">
+      <h2>Truy vấn Giao dịch</h2>
+      <form id="queryForm">
+        <label for="startTime">Giờ bắt đầu (HH:mm:ss):</label>
+        <input
+          type="text"
+          id="startTime"
+          name="startTime"
+          required
+          placeholder="00:00:00"
+        />
+        <label for="endTime">Giờ kết thúc (HH:mm:ss):</label>
+        <input
+          type="text"
+          id="endTime"
+          name="endTime"
+          required
+          placeholder="23:59:59"
+        />
+        <button type="submit">Truy vấn</button>
+      </form>
+
+      <div id="queryResult"></div>
+    </div>
+
+    <script>
+      document
+        .getElementById("uploadForm")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const formData = new FormData(event.target);
+          try {
+            const response = await fetch("http://localhost:3000/api/upload", {
+              method: "POST",
+              body: formData,
+            });
+            const result = await response.json();
+            document.getElementById("uploadMessage").innerText = result.message;
+          } catch (error) {
+            document.getElementById("uploadMessage").innerText =
+              "Error uploading file.";
+          }
+        });
+
+      document
+        .getElementById("queryForm")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const startTime = document.getElementById("startTime").value;
+          const endTime = document.getElementById("endTime").value;
+
+          const timeRegex = /^([0-1]\d|2[0-3]):([0-5]\d):([0-5]\d)$/;
+
+          if (!timeRegex.test(startTime) || !timeRegex.test(endTime)) {
+            alert("Invalid time format. Please use HH:mm:ss format.");
+            return;
+          }
+
+          try {
+            const response = await fetch(
+              `http://localhost:3000/api/transactions?startTime=${startTime}&endTime=${endTime}`
+            );
+            const result = await response.json();
+            document.getElementById(
+              "queryResult"
+            ).innerText = `Tổng thành tiền: ${result.totalAmount || 0}`;
+          } catch (error) {
+            document.getElementById("queryResult").innerText =
+              "Error querying transactions.";
+          }
+        });
+    </script>
+  </body>
+</html>

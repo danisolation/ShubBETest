@@ -1,0 +1,43 @@
+CREATE TABLE GasStation (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    location VARCHAR(255) NOT NULL,
+    "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "modifiedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE Product (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    "pricePerUnit" DECIMAL(10, 2) NOT NULL,
+    "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "modifiedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE Pump (
+    id SERIAL PRIMARY KEY,
+    "gasStationId" INT NOT NULL,
+    "productId" INT NOT NULL,
+    "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "modifiedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY ("gasStationId") REFERENCES GasStation(id) ON DELETE CASCADE,
+    FOREIGN KEY ("productId") REFERENCES Product(id) ON DELETE CASCADE
+);
+
+CREATE TABLE Transaction (
+    id SERIAL PRIMARY KEY,
+    "gasStationId" INT NOT NULL,
+    "pumpId" INT NOT NULL,
+    "productId" INT NOT NULL,
+    quantity DECIMAL(10, 2) NOT NULL,
+    "totalPrice" DECIMAL(10, 2) NOT NULL,
+    "transactionTime" TIMESTAMP NOT NULL,
+    "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "modifiedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY ("gasStationId") REFERENCES GasStation(id) ON DELETE CASCADE,
+    FOREIGN KEY ("pumpId") REFERENCES Pump(id) ON DELETE CASCADE,
+    FOREIGN KEY ("productId") REFERENCES Product(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_transaction_time ON Transaction (transaction_time);
